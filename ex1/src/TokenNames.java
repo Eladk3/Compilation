@@ -1,19 +1,5 @@
 public interface TokenNames {
     /* terminals */
-    public static final int EOF = 0;
-    public static final int PLUS = 1;
-    public static final int MINUS = 2;
-    public static final int TIMES = 3;
-    public static final int DIVIDE = 4;
-    public static final int LPAREN = 5;
-    public static final int RPAREN = 6;
-    public static final int NUMBER = 7;
-    public static final int ID = 8;
-    public static final int LBRACK = 9;
-    public static final int RBRACK = 10;
-    public static final int COMMA = 11;
-    public static final int DOT = 12;
-    public static final int SEMICOLON = 13;
     public static final int TYPE_INT = 14;
     public static final int TYPE_VOID = 15;
     public static final int ASSIGN = 16;
@@ -40,4 +26,18 @@ public interface TokenNames {
     public static final int END_COMMENT = 37;
     public static final int ERROR = 38;
     public static final int STRING = 39;
+    public static final int EOF = 0;
+    public static final int PLUS = 1;
+    public static final int MINUS = 2;
+    public static final int TIMES = 3;
+    public static final int DIVIDE = 4;
+    public static final int LPAREN = 5;
+    public static final int RPAREN = 6;
+    public static final int NUMBER = 7;
+    public static final int ID = 8;
+    public static final int LBRACK = 9;
+    public static final int RBRACK = 10;
+    public static final int COMMA = 11;
+    public static final int DOT = 12;
+    public static final int SEMICOLON = 13;
 }
