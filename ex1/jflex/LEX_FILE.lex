@@ -13,33 +13,6 @@ import java_cup.runtime.*;
 
 %%
 
-/************************************/
-/* OPTIONS AND DECLARATIONS SECTION */
-/************************************/
-   
-/*****************************************************/ 
-/* Lexer is the name of the class JFlex will create. */
-/* The code will be written to the file Lexer.java.  */
-/*****************************************************/ 
-%class Lexer
-
-/********************************************************************/
-/* The current line number can be accessed with the variable yyline */
-/* and the current column number with the variable yycolumn.        */
-/********************************************************************/
-%line
-%column
-
-/*******************************************************************************/
-/* Note that this has to be the EXACT same name of the class the CUP generates */
-/*******************************************************************************/
-%cupsym TokenNames
-
-/******************************************************************/
-/* CUP compatibility mode interfaces with a CUP generated parser. */
-/******************************************************************/
-%cup
-
 /****************/
 /* DECLARATIONS */
 /****************/
@@ -50,30 +23,30 @@ import java_cup.runtime.*;
 /* scanner actions.                                                          */  
 /*****************************************************************************/   
 %{
-	/*********************************************************************************/
-	/* Create a new java_cup.runtime.Symbol with information about the current token */
-	/*********************************************************************************/
-	private Symbol symbol(int type)               {return new Symbol(type, yyline, yycolumn);}
-	private Symbol symbol(int type, Object value) {return new Symbol(type, yyline, yycolumn, value);}
+    /*********************************************************************************/
+    /* Create a new java_cup.runtime.Symbol with information about the current token */
+    /*********************************************************************************/
+    private Symbol symbol(int type)               {return new Symbol(type, yyline, yycolumn);}
+    private Symbol symbol(int type, Object value) {return new Symbol(type, yyline, yycolumn, value);}
 
-	/*******************************************/
-	/* Enable line number extraction from main */
-	/*******************************************/
-	public int getLine() { return yyline + 1; } 
+    /*******************************************/
+    /* Enable line number extraction from main */
+    /*******************************************/
+    public int getLine() { return yyline + 1; } 
 
-	/**********************************************/
-	/* Enable token position extraction from main */
-	/**********************************************/
-	public int getTokenStartPosition() { return yycolumn + 1; } 
+    /**********************************************/
+    /* Enable token position extraction from main */
+    /**********************************************/
+    public int getTokenStartPosition() { return yycolumn + 1; } 
 %}
 
 /***********************/
-/* MACRO DECALARATIONS */
+/* MACRO DECLARATIONS */
 /***********************/
-LineTerminator	= \r|\n|\r\n
-WhiteSpace		= {LineTerminator} | [ \t]
-INTEGER			= 0 | [1-9][0-9]*
-ID				= [a-zA-Z][a-zA-Z0-9]*
+LineTerminator  = \r|\n|\r\n
+WhiteSpace      = {LineTerminator} | [ \t]
+INTEGER         = 0 | [1-9][0-9]*
+ID              = [a-zA-Z][a-zA-Z0-9]*
 
 /* Keywords */
 CLASS           = "class"
@@ -104,8 +77,10 @@ STRING          = "string"
 /* scanner is in the start state YYINITIAL.                   */
 /**************************************************************/
 
-<YYINITIAL> {
+/* Add the COMMENT state declaration */
+%state COMMENT
 
+<YYINITIAL> {
 
 {WhiteSpace}            { /* just skip what was found, do nothing */ }
 
@@ -140,14 +115,18 @@ STRING          = "string"
 {STRING}                { return symbol(TokenNames.TYPE_STRING); }
 
 {INTEGER}               { return symbol(TokenNames.INT, new Integer(yytext())); }
-\"([a-zA-Z]*)\"         { return symbol(TokenNames.STRING, yytext()); }
+/\"([^\"\n]*)\"         { return symbol(TokenNames.STRING, yytext()); } // Properly escape quotes
 {ID}                    { return symbol(TokenNames.ID, yytext()); }
 
 "//".*                  { /* skip single-line comments */ }
 "/*"                    { yybegin(COMMENT); }
-<COMMENT>[^*]*          { /* ignore comment content */ }
-<COMMENT>"*"+"/"        { yybegin(YYINITIAL); }
-<COMMENT><<EOF>>        { return symbol(TokenNames.ERROR); }
+}
+
+<COMMENT> {
+[^*]*                  { /* ignore comment content */ }
+"*"[^/]                { /* ignore comment content */ }
+"*"/                   { yybegin(YYINITIAL); }
+<<EOF>>                { return symbol(TokenNames.ERROR); }
+}
 
 <<EOF>>                 { return symbol(TokenNames.EOF); }
-}
