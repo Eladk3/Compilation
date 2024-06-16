@@ -22,7 +22,7 @@ MANIFEST_FILE        = ${MANIFEST_DIR}/MANIFEST.MF
 ########################
 # DEFINITIONS :: JFlex #
 ########################
-JFlex_PROGRAM  = jflex
+JFlex_PROGRAM  = ${BASEDIR}/../../jflex-1.9.1/bin/jflex
 JFlex_FLAGS    = -q
 JFlex_DEST_DIR = ${SRC_DIR}
 JFlex_FILE     = ${JFlex_DIR}/LEX_FILE.lex
@@ -30,7 +30,7 @@ JFlex_FILE     = ${JFlex_DIR}/LEX_FILE.lex
 ########################
 # DEFINITIONS :: LEXER #
 ########################
-INPUT    = ${INPUT_DIR}/Input.txt
+INPUT    = ${INPUT_DIR}/TEST_02_Merge_Lists.txt
 OUTPUT   = ${OUTPUT_DIR}/OutputTokens.txt
 
 all:
