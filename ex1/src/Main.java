@@ -1,4 +1,3 @@
-   
 import java.io.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
@@ -16,7 +15,7 @@ public class Main
 		String outputFilename = argv[1];
 		boolean isComment = false;
 		String fieldName;
-		
+
 		try
 		{
 			/********************************/
