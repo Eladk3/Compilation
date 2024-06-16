@@ -1,132 +1,90 @@
-/***************************/
-/* FILE NAME: LEX_FILE.lex */
-/***************************/
-
-/*************/
-/* USER CODE */
-/*************/
-import java_cup.runtime.*;
-
-/******************************/
-/* DOLAR DOLAR - DON'T TOUCH! */
-/******************************/
+/* JFlex configuration file for lexical scanner */
 
 %%
 
-/****************/
-/* DECLARATIONS */
-/****************/
-/*****************************************************************************/   
-/* Code between %{ and %}, both of which must be at the beginning of a line, */
-/* will be copied verbatim (letter to letter) into the Lexer class code.     */
-/* Here you declare member variables and functions that are used inside the  */
-/* scanner actions.                                                          */  
-/*****************************************************************************/   
+/* User code section */
 %{
-    /*********************************************************************************/
-    /* Create a new java_cup.runtime.Symbol with information about the current token */
-    /*********************************************************************************/
-    private Symbol symbol(int type)               {return new Symbol(type, yyline, yycolumn);}
-    private Symbol symbol(int type, Object value) {return new Symbol(type, yyline, yycolumn, value);}
-
-    /*******************************************/
-    /* Enable line number extraction from main */
-    /*******************************************/
-    public int getLine() { return yyline + 1; } 
-
-    /**********************************************/
-    /* Enable token position extraction from main */
-    /**********************************************/
-    public int getTokenStartPosition() { return yycolumn + 1; } 
+  import java.io.*;
+  import java.util.*;
+  import java_cup.runtime.Symbol;
 %}
 
-/***********************/
-/* MACRO DECLARATIONS */
-/***********************/
-LineTerminator  = \r|\n|\r\n
-WhiteSpace      = {LineTerminator} | [ \t]
-INTEGER         = 0 | [1-9][0-9]*
-ID              = [a-zA-Z][a-zA-Z0-9]*
+%class Lexer
+%unicode
+%cup
+%type Symbol
+%function yylex
+%line
+%column
+
+/* Define tokens */
+%{
+  private void error() {
+    System.out.println("ERROR");
+    System.exit(1);
+  }
+%}
+
+/* Regular expressions and token rules */
+%%
+/* Whitespace */
+[ \t\n\r]+                  { /* skip whitespace */ }
+
+/* Comments */
+"//"[^\n]*                  { /* skip single line comment */ }
+"/*"([^*]|\*+[^*/])*\*+"/"  { /* skip multi-line comment */ }
 
 /* Keywords */
-CLASS           = "class"
-NIL             = "nil"
-ARRAY           = "array"
-WHILE           = "while"
-INT             = "int"
-VOID            = "void"
-EXTENDS         = "extends"
-RETURN          = "return"
-NEW             = "new"
-IF              = "if"
-STRING          = "string"
+"class"                     { return new Symbol(sym.CLASS); }
+"nil"                       { return new Symbol(sym.NIL); }
+"array"                     { return new Symbol(sym.ARRAY); }
+"while"                     { return new Symbol(sym.WHILE); }
+"int"                       { return new Symbol(sym.TYPE_INT); }
+"void"                      { return new Symbol(sym.TYPE_VOID); }
+"extends"                   { return new Symbol(sym.EXTENDS); }
+"return"                    { return new Symbol(sym.RETURN); }
+"new"                       { return new Symbol(sym.NEW); }
+"if"                        { return new Symbol(sym.IF); }
+"string"                    { return new Symbol(sym.TYPE_STRING); }
 
-/******************************/
-/* DOLAR DOLAR - DON'T TOUCH! */
-/******************************/
+/* Operators and Delimiters */
+"("                         { return new Symbol(sym.LPAREN); }
+")"                         { return new Symbol(sym.RPAREN); }
+"["                         { return new Symbol(sym.LBRACK); }
+"]"                         { return new Symbol(sym.RBRACK); }
+"{"                         { return new Symbol(sym.LBRACE); }
+"}"                         { return new Symbol(sym.RBRACE); }
+"+"                         { return new Symbol(sym.PLUS); }
+"-"                         { return new Symbol(sym.MINUS); }
+"*"                         { return new Symbol(sym.TIMES); }
+"/"                         { return new Symbol(sym.DIVIDE); }
+","                         { return new Symbol(sym.COMMA); }
+"."                         { return new Symbol(sym.DOT); }
+";"                         { return new Symbol(sym.SEMICOLON); }
+":="                        { return new Symbol(sym.ASSIGN); }
+"="                         { return new Symbol(sym.EQ); }
+"<"                         { return new Symbol(sym.LT); }
+">"                         { return new Symbol(sym.GT); }
 
-%%
+/* Identifiers */
+[a-zA-Z][a-zA-Z0-9]*        { return new Symbol(sym.ID, yytext()); }
 
-/************************************************************/
-/* LEXER matches regular expressions to actions (Java code) */
-/************************************************************/
+/* Integers */
+0|[1-9][0-9]*               { 
+                              try {
+                                int value = Integer.parseInt(yytext());
+                                if (value >= 0 && value <= 32767) {
+                                  return new Symbol(sym.INT, value);
+                                } else {
+                                  error();
+                                }
+                              } catch (NumberFormatException e) {
+                                error();
+                              }
+                            }
 
-/**************************************************************/
-/* YYINITIAL is the state at which the lexer begins scanning. */
-/* So these regular expressions will only be matched if the   */
-/* scanner is in the start state YYINITIAL.                   */
-/**************************************************************/
+/* Strings */
+\"[a-zA-Z]*\"               { return new Symbol(sym.STRING, yytext()); }
 
-/* Add the COMMENT state declaration */
-%state COMMENT
-
-<YYINITIAL> {
-
-{WhiteSpace}            { /* just skip what was found, do nothing */ }
-
-"+"                     { return symbol(TokenNames.PLUS); }
-"-"                     { return symbol(TokenNames.MINUS); }
-"*"                     { return symbol(TokenNames.TIMES); }
-"/"                     { return symbol(TokenNames.DIVIDE); }
-"("                     { return symbol(TokenNames.LPAREN); }
-")"                     { return symbol(TokenNames.RPAREN); }
-"["                     { return symbol(TokenNames.LBRACK); }
-"]"                     { return symbol(TokenNames.RBRACK); }
-"{"                     { return symbol(TokenNames.LBRACE); }
-"}"                     { return symbol(TokenNames.RBRACE); }
-","                     { return symbol(TokenNames.COMMA); }
-"."                     { return symbol(TokenNames.DOT); }
-";"                     { return symbol(TokenNames.SEMICOLON); }
-"="                     { return symbol(TokenNames.EQ); }
-"<"                     { return symbol(TokenNames.LT); }
-">"                     { return symbol(TokenNames.GT); }
-":="                    { return symbol(TokenNames.ASSIGN); }
-
-{CLASS}                 { return symbol(TokenNames.CLASS); }
-{NIL}                   { return symbol(TokenNames.NIL); }
-{ARRAY}                 { return symbol(TokenNames.ARRAY); }
-{WHILE}                 { return symbol(TokenNames.WHILE); }
-{INT}                   { return symbol(TokenNames.TYPE_INT); }
-{VOID}                  { return symbol(TokenNames.TYPE_VOID); }
-{EXTENDS}               { return symbol(TokenNames.EXTENDS); }
-{RETURN}                { return symbol(TokenNames.RETURN); }
-{NEW}                   { return symbol(TokenNames.NEW); }
-{IF}                    { return symbol(TokenNames.IF); }
-{STRING}                { return symbol(TokenNames.TYPE_STRING); }
-
-{INTEGER}               { return symbol(TokenNames.INT, new Integer(yytext())); }
-/\"([^\"\n]*)\"         { return symbol(TokenNames.STRING, yytext()); } // Properly escape quotes
-{ID}                    { return symbol(TokenNames.ID, yytext()); }
-
-"//".*                  { /* skip single-line comments */ }
-"/*"                    { yybegin(COMMENT); }
-}
-
-<COMMENT> {
-[^*]*                  { /* ignore comment content */ }
-"*"[^/]                { /* ignore comment content */ }
-"*"/                   { yybegin(YYINITIAL); }
-<<EOF>>                { return symbol(TokenNames.ERROR); }
-}
-
-<<EOF>>                 { return symbol(TokenNames.EOF); }
+/* Error handling */
+.                           { error(); }
