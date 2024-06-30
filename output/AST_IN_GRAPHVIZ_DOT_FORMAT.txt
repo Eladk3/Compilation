@@ -1,0 +1,388 @@
+digraph
+{
+graph [ordering = "out"]
+v0 [label = "TYPE
+INT"];
+v1 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v1 -> v0;
+v2 [label = "TYPE
+INT"];
+v3 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v3 -> v2;
+v4 [label = "FUNCTION ARGUMENTS"];
+v4 -> v3;
+v5 [label = "TYPE
+INT"];
+v6 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v6 -> v5;
+v7 [label = "INT(2)"];
+v8 [label = "VARDEC
+TYPE
+AND
+ID
+EXP"];
+v8 -> v6;
+v8 -> v7;
+v9 [label = "STATEMENT
+VARIABLE DECLARATION"];
+v9 -> v8;
+v10 [label = "TYPE
+INT"];
+v11 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v11 -> v10;
+v12 [label = "INT(2)"];
+v13 [label = "VARDEC
+TYPE
+AND
+ID
+EXP"];
+v13 -> v11;
+v13 -> v12;
+v14 [label = "STATEMENT
+VARIABLE DECLARATION"];
+v14 -> v13;
+v15 [label = "SIMPLE
+VAR
+(i)"];
+v16 [label = "EXP
+VAR"];
+v16 -> v15;
+v17 [label = "BINARY OPERATION
+Operation: 4"];
+v18 [label = "SIMPLE
+VAR
+(p)"];
+v19 [label = "EXP
+VAR"];
+v19 -> v18;
+v20 [label = "EXPRESSION
+BINOP"];
+v20 -> v16;
+v20 -> v17;
+v20 -> v19;
+v21 [label = "SIMPLE
+VAR
+(j)"];
+v22 [label = "EXP
+VAR"];
+v22 -> v21;
+v23 [label = "BINARY OPERATION
+Operation: 4"];
+v24 [label = "SIMPLE
+VAR
+(p)"];
+v25 [label = "EXP
+VAR"];
+v25 -> v24;
+v26 [label = "EXPRESSION
+BINOP"];
+v26 -> v22;
+v26 -> v23;
+v26 -> v25;
+v27 [label = "SIMPLE
+VAR
+(i)"];
+v28 [label = "EXP
+VAR"];
+v28 -> v27;
+v29 [label = "BINARY OPERATION
+Operation: 2"];
+v30 [label = "SIMPLE
+VAR
+(j)"];
+v31 [label = "EXP
+VAR"];
+v31 -> v30;
+v32 [label = "BINARY OPERATION
+Operation: 6"];
+v33 [label = "SIMPLE
+VAR
+(p)"];
+v34 [label = "EXP
+VAR"];
+v34 -> v33;
+v35 [label = "EXPRESSION
+BINOP"];
+v35 -> v31;
+v35 -> v32;
+v35 -> v34;
+v36 [label = "EXPRESSION
+BINOP"];
+v36 -> v28;
+v36 -> v29;
+v36 -> v35;
+v37 [label = "INT(1)"];
+v38 [label = "STATEMENT
+RETURN WITH EXPRESSION"];
+v38 -> v37;
+v39 [label = "STMT
+LIST
+"];
+v39 -> v38;
+v40 [label = "IF STATEMENT"];
+v40 -> v36;
+v40 -> v39;
+v41 [label = "SIMPLE
+VAR
+(j)"];
+v42 [label = "SIMPLE
+VAR
+(j)"];
+v43 [label = "EXP
+VAR"];
+v43 -> v42;
+v44 [label = "BINARY OPERATION
+Operation: 0"];
+v45 [label = "INT(1)"];
+v46 [label = "EXPRESSION
+BINOP"];
+v46 -> v43;
+v46 -> v44;
+v46 -> v45;
+v47 [label = "ASSIGN
+left := right
+"];
+v47 -> v41;
+v47 -> v46;
+v48 [label = "STMT
+LIST
+"];
+v48 -> v47;
+v49 [label = "STMT
+LIST
+"];
+v49 -> v40;
+v49 -> v48;
+v50 [label = "WHILE LOOP STATEMENT"];
+v50 -> v26;
+v50 -> v49;
+v51 [label = "SIMPLE
+VAR
+(i)"];
+v52 [label = "SIMPLE
+VAR
+(i)"];
+v53 [label = "EXP
+VAR"];
+v53 -> v52;
+v54 [label = "BINARY OPERATION
+Operation: 0"];
+v55 [label = "INT(1)"];
+v56 [label = "EXPRESSION
+BINOP"];
+v56 -> v53;
+v56 -> v54;
+v56 -> v55;
+v57 [label = "ASSIGN
+left := right
+"];
+v57 -> v51;
+v57 -> v56;
+v58 [label = "STMT
+LIST
+"];
+v58 -> v57;
+v59 [label = "STMT
+LIST
+"];
+v59 -> v50;
+v59 -> v58;
+v60 [label = "WHILE LOOP STATEMENT"];
+v60 -> v20;
+v60 -> v59;
+v61 [label = "INT(0)"];
+v62 [label = "STATEMENT
+RETURN WITH EXPRESSION"];
+v62 -> v61;
+v63 [label = "STMT
+LIST
+"];
+v63 -> v62;
+v64 [label = "STMT
+LIST
+"];
+v64 -> v60;
+v64 -> v63;
+v65 [label = "STMT
+LIST
+"];
+v65 -> v14;
+v65 -> v64;
+v66 [label = "STMT
+LIST
+"];
+v66 -> v9;
+v66 -> v65;
+v67 [label = "FUNCDEC
+WITH ARGS"];
+v67 -> v1;
+v67 -> v4;
+v67 -> v66;
+v68 [label = "DECLARATION
+FUNC DEC"];
+v68 -> v67;
+v69 [label = "TYPE
+VOID"];
+v70 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v70 -> v69;
+v71 [label = "TYPE
+INT"];
+v72 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v72 -> v71;
+v73 [label = "TYPE
+INT"];
+v74 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v74 -> v73;
+v75 [label = "FUNCTION ARGUMENTS"];
+v75 -> v74;
+v76 [label = "FUNCTION ARGUMENTS"];
+v76 -> v72;
+v76 -> v75;
+v77 [label = "TYPE
+INT"];
+v78 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v78 -> v77;
+v79 [label = "INT(2)"];
+v80 [label = "VARDEC
+TYPE
+AND
+ID
+EXP"];
+v80 -> v78;
+v80 -> v79;
+v81 [label = "STATEMENT
+VARIABLE DECLARATION"];
+v81 -> v80;
+v82 [label = "SIMPLE
+VAR
+(p)"];
+v83 [label = "EXP
+VAR"];
+v83 -> v82;
+v84 [label = "BINARY OPERATION
+Operation: 4"];
+v85 [label = "SIMPLE
+VAR
+(end)"];
+v86 [label = "EXP
+VAR"];
+v86 -> v85;
+v87 [label = "BINARY OPERATION
+Operation: 0"];
+v88 [label = "INT(1)"];
+v89 [label = "EXPRESSION
+BINOP"];
+v89 -> v86;
+v89 -> v87;
+v89 -> v88;
+v90 [label = "EXPRESSION
+BINOP"];
+v90 -> v83;
+v90 -> v84;
+v90 -> v89;
+v91 [label = "SIMPLE
+VAR
+(p)"];
+v92 [label = "EXP
+VAR"];
+v92 -> v91;
+v93 [label = "EXPRESSION ARGUMENT"];
+v93 -> v92;
+v94 [label = "FUNCTION CALL WITH ARGUMENTS
+Function Name: IsPrime"];
+v94 -> v93;
+v95 [label = "EXPRESSION
+FUNCTION CALL"];
+v95 -> v94;
+v96 [label = "SIMPLE
+VAR
+(p)"];
+v97 [label = "EXP
+VAR"];
+v97 -> v96;
+v98 [label = "EXPRESSION ARGUMENT"];
+v98 -> v97;
+v99 [label = "FUNCTION CALL WITH ARGUMENTS
+Function Name: PrintInt"];
+v99 -> v98;
+v100 [label = "FUNCTION CALL STATEMENT"];
+v100 -> v99;
+v101 [label = "STMT
+LIST
+"];
+v101 -> v100;
+v102 [label = "IF STATEMENT"];
+v102 -> v95;
+v102 -> v101;
+v103 [label = "STMT
+LIST
+"];
+v103 -> v102;
+v104 [label = "WHILE LOOP STATEMENT"];
+v104 -> v90;
+v104 -> v103;
+v105 [label = "STMT
+LIST
+"];
+v105 -> v104;
+v106 [label = "STMT
+LIST
+"];
+v106 -> v81;
+v106 -> v105;
+v107 [label = "FUNCDEC
+WITH ARGS"];
+v107 -> v70;
+v107 -> v76;
+v107 -> v106;
+v108 [label = "DECLARATION
+FUNC DEC"];
+v108 -> v107;
+v109 [label = "TYPE
+VOID"];
+v110 [label = "TYPE AND
+IDENTIFIER SINGLE"];
+v110 -> v109;
+v111 [label = "INT(2)"];
+v112 [label = "INT(100)"];
+v113 [label = "EXPRESSION ARGUMENT"];
+v113 -> v112;
+v114 [label = "EXPRESSION ARGUMENT"];
+v114 -> v111;
+v114 -> v113;
+v115 [label = "FUNCTION CALL WITH ARGUMENTS
+Function Name: PrintPrimes"];
+v115 -> v114;
+v116 [label = "FUNCTION CALL STATEMENT"];
+v116 -> v115;
+v117 [label = "STMT
+LIST
+"];
+v117 -> v116;
+v118 [label = "FUNCDEC
+NO ARGS"];
+v118 -> v110;
+v118 -> v117;
+v119 [label = "DECLARATION
+FUNC DEC"];
+v119 -> v118;
+v120 [label = "PROGRAM
+LIST"];
+v120 -> v119;
+v121 [label = "PROGRAM
+LIST"];
+v121 -> v108;
+v121 -> v120;
+v122 [label = "PROGRAM
+LIST"];
+v122 -> v68;
+v122 -> v121;
+}
