@@ -1,1 +1,1 @@
-EXTENDS(ident)[3,1]
+ERROR

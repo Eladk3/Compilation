@@ -71,25 +71,21 @@ import java_cup.runtime.*;
 /***********************/
 LineTerminator	= \r|\n|\r\n
 WhiteSpace		= {LineTerminator} | [ \t]
-// INTEGER			= 0 | [1-9][0-9]*
-INTEGER			= [0-9]+
+INTEGER			= [1-9][0-9]* | 0
 ID				= [a-zA-Z][a-zA-Z0-9]*
 START_COMMENT 	= \/\*
 END_COMMENT		= \*\/
-LINE_COMMENT 	= "//" [a-zA-Z0-9\t\+\-\*\/\.\;\(\)\[\]\{\}\?\!\t ]* {LineTerminator}
-STRING  		= \"[a-zA-Z]*\" //\"(\\.|[^\"\\])*\"
-COMMENT_CHAR	= [a-zA-Z0-9\t\r|\n|\r\n\+\-\*\/\.\;\(\)\[\]\{\}\s\?\!]
+LINE_COMMENT 	= "//" [a-zA-Z0-9\t\+\-\*\/\.\;\(\)\[\]\{\}\?\!\s]* {LineTerminator}
+STRING  		= \"[a-zA-Z]*\"
+COMMENT_CHAR	= [a-zA-Z0-9\t\r\n\+\-\*\/\.\;\(\)\[\]\{\}\s\?\!]
 ERROR			= "//" {COMMENT_CHAR}* {STRING} {COMMENT_CHAR}* {LineTerminator}
-
-
-// LINE_COMMENT_2 	= {START_COMMENT}.*{END_COMMENT}
-// LINE_COMMENT 	= {LINE_COMMENT_1} | {LINE_COMMENT_2}
 
 /******************************/
 /* DOLAR DOLAR - DON'T TOUCH! */
 /******************************/
 
 %state COMMENT
+%state LINE_COMMENT
 %state STRING
 
 %%
@@ -105,53 +101,54 @@ ERROR			= "//" {COMMENT_CHAR}* {STRING} {COMMENT_CHAR}* {LineTerminator}
 /**************************************************************/
 
 <YYINITIAL> {
-	"/"					{ return symbol(TokenNames.DIVIDE);}
-	"("					{ return symbol(TokenNames.LPAREN);}
-	")"					{ return symbol(TokenNames.RPAREN);}
-	"["					{ return symbol(TokenNames.LBRACK);}
-	"]" 				{ return symbol(TokenNames.RBRACK);}
-	"{"					{ return symbol(TokenNames.LBRACE);}
-	"}"					{ return symbol(TokenNames.RBRACE);}
-	"nil"				{ return symbol(TokenNames.NIL);}
-	"+"					{ return symbol(TokenNames.PLUS);}
-	"-"					{ return symbol(TokenNames.MINUS);}
-	"*"					{ return symbol(TokenNames.TIMES);}
-	"/"					{ return symbol(TokenNames.DEVIDE);}
-	","					{ return symbol(TokenNames.COMMA);}
-	"."					{ return symbol(TokenNames.DOT);}
-	";"					{ return symbol(TokenNames.SEMICOLON);}
-	"int"				{ return symbol(TokenNames.TYPE_INT);}
-	"void"				{ return symbol(TokenNames.TYPE_VOID);}
-	":="				{ return symbol(TokenNames.ASSIGN);}
-	"="					{ return symbol(TokenNames.EQ);}
-	"<"					{ return symbol(TokenNames.LT);}
-	">"					{ return symbol(TokenNames.GT);}
-	"class"				{ return symbol(TokenNames.CLASS);}
-	"array"				{ return symbol(TokenNames.ARRAY);}
-	"extends"			{ return symbol(TokenNames.EXTENDS);}
-	"return"			{ return symbol(TokenNames.RETURN);}
-	"while"				{ return symbol(TokenNames.WHILE);}
-	"if"				{ return symbol(TokenNames.IF);}
-	"new"				{ return symbol(TokenNames.NEW);}
-	"string"			{ return symbol(TokenNames.TYPE_STRING);}
-	"class"				{ return symbol(TokenNames.CLASS);}
-	{INTEGER}			{ return symbol(TokenNames.INT, new String(yytext()));}
-	{ID}				{ return symbol(TokenNames.ID, new String( yytext()));}  
-	{LineTerminator}	{ } 
-	{WhiteSpace}		{ /* just skip what was found, do nothing */ }
-	{LINE_COMMENT}		{ }
-	{START_COMMENT}		{ yybegin(COMMENT);  return symbol(TokenNames.START_COMMENT); }
-	{STRING}			{ return symbol(TokenNames.STRING, new String( yytext())); }
-	<<EOF>>				{ return symbol(TokenNames.EOF);}
+	"("					{ System.out.println("Matched LPAREN: " + yytext()); return symbol(TokenNames.LPAREN); }
+	")"					{ System.out.println("Matched RPAREN: " + yytext()); return symbol(TokenNames.RPAREN); }
+	"["					{ System.out.println("Matched LBRACK: " + yytext()); return symbol(TokenNames.LBRACK); }
+	"]" 				{ System.out.println("Matched RBRACK: " + yytext()); return symbol(TokenNames.RBRACK); }
+	"{"					{ System.out.println("Matched LBRACE: " + yytext()); return symbol(TokenNames.LBRACE); }
+	"}"					{ System.out.println("Matched RBRACE: " + yytext()); return symbol(TokenNames.RBRACE); }
+	"nil"				{ System.out.println("Matched NIL: " + yytext()); return symbol(TokenNames.NIL); }
+	"+"					{ System.out.println("Matched PLUS: " + yytext()); return symbol(TokenNames.PLUS); }
+	"-"					{ System.out.println("Matched MINUS: " + yytext()); return symbol(TokenNames.MINUS); }
+	"*"					{ System.out.println("Matched TIMES: " + yytext()); return symbol(TokenNames.TIMES); }
+	"/"					{ System.out.println("Matched DIVIDE: " + yytext()); return symbol(TokenNames.DIVIDE); }
+	","					{ System.out.println("Matched COMMA: " + yytext()); return symbol(TokenNames.COMMA); }
+	"."					{ System.out.println("Matched DOT: " + yytext()); return symbol(TokenNames.DOT); }
+	";"					{ System.out.println("Matched SEMICOLON: " + yytext()); return symbol(TokenNames.SEMICOLON); }
+	"int"				{ System.out.println("Matched TYPE_INT: " + yytext()); return symbol(TokenNames.TYPE_INT); }
+	"void"				{ System.out.println("Matched TYPE_VOID: " + yytext()); return symbol(TokenNames.TYPE_VOID); }
+	":="				{ System.out.println("Matched ASSIGN: " + yytext()); return symbol(TokenNames.ASSIGN); }
+	"="					{ System.out.println("Matched EQ: " + yytext()); return symbol(TokenNames.EQ); }
+	"<"					{ System.out.println("Matched LT: " + yytext()); return symbol(TokenNames.LT); }
+	">"					{ System.out.println("Matched GT: " + yytext()); return symbol(TokenNames.GT); }
+	"class"				{ System.out.println("Matched CLASS: " + yytext()); return symbol(TokenNames.CLASS); }
+	"array"				{ System.out.println("Matched ARRAY: " + yytext()); return symbol(TokenNames.ARRAY); }
+	"extends"			{ System.out.println("Matched EXTENDS: " + yytext()); return symbol(TokenNames.EXTENDS); }
+	"return"			{ System.out.println("Matched RETURN: " + yytext()); return symbol(TokenNames.RETURN); }
+	"while"				{ System.out.println("Matched WHILE: " + yytext()); return symbol(TokenNames.WHILE); }
+	"if"				{ System.out.println("Matched IF: " + yytext()); return symbol(TokenNames.IF); }
+	"new"				{ System.out.println("Matched NEW: " + yytext()); return symbol(TokenNames.NEW); }
+	"string"			{ System.out.println("Matched TYPE_STRING: " + yytext()); return symbol(TokenNames.TYPE_STRING); }
+	{INTEGER}			{ System.out.println("Matched INT: " + yytext()); return symbol(TokenNames.INT, new String(yytext())); }
+	{ID}				{ System.out.println("Matched ID: " + yytext()); return symbol(TokenNames.ID, new String(yytext())); }  
+	{LineTerminator}	{ System.out.println("Skipped LineTerminator: " + yytext()); } 
+	{WhiteSpace}		{ System.out.println("Skipped WhiteSpace: " + yytext()); /* just skip what was found, do nothing */ }
+	{LINE_COMMENT}		{ System.out.println("Matched LINE_COMMENT: " + yytext()); yybegin(LINE_COMMENT); }
+	{START_COMMENT}		{ System.out.println("Matched START_COMMENT: " + yytext()); yybegin(COMMENT); }
+	{STRING}			{ System.out.println("Matched STRING: " + yytext()); return symbol(TokenNames.STRING, new String(yytext())); }
+	<<EOF>>				{ System.out.println("Matched EOF"); return symbol(TokenNames.EOF); }
+}
+
+<LINE_COMMENT> {
+    {LineTerminator}	{ System.out.println("Matched LineTerminator in COMMENT: " + yytext()); yybegin(YYINITIAL); }
+    .					{ /* skip comment text */ }
 }
 
 <COMMENT> {
-	"*"					{}
-	{COMMENT_CHAR}		{}
-	"*/"				{ yybegin(YYINITIAL); return symbol(TokenNames.END_COMMENT); }
-
+	"*"					{ System.out.println("Inside COMMENT: *"); }
+	{COMMENT_CHAR}		{ System.out.println("Inside COMMENT: " + yytext()); }
+	"*/"				{ System.out.println("Matched END_COMMENT: " + yytext()); yybegin(YYINITIAL); }
 }
 
-
-{ERROR}					{ return symbol(TokenNames.ERROR, new String( yytext()));}
-.						{ return symbol(TokenNames.ERROR, new String( yytext()));}
+{ERROR}					{ System.out.println("Matched ERROR: " + yytext()); return symbol(TokenNames.ERROR, new String(yytext())); }
+.						{ System.out.println("Matched ERROR (default): " + yytext()); return symbol(TokenNames.ERROR, new String(yytext())); }
