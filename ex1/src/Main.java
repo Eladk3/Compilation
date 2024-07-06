@@ -48,28 +48,31 @@ public class Main
 				/************************/
 				/* [6] Print to console */
 				/************************/
+				/* 
+				df
+
+				//*/
 				Class<TokenNames> tokenNamesClass = TokenNames.class;
 
 				Field[] fields = tokenNamesClass.getDeclaredFields();
-
-				// Check for comment tokens
+				
 				if (s.sym == TokenNames.START_COMMENT) isComment = true;
 				if (s.sym == TokenNames.END_COMMENT) isComment = false;
-				
-				// Check for error tokens
+
+
+				// if (!isComment && s.sym == TokenNames.ELSE)
+				// 	file_writer.println("ERROR");
+				// if (!isComment) {
+				// file_writer.println(fields[s.sym].getName());
 				if (fields[s.sym].getName() == "ERROR") {
+					// file_writer.println(s.value);
 					throw new Exception("Illegal characters");
 				}
-				
 				fieldName = fields[s.sym].getName();
-
-				// Skip comment tokens for writing to the file
 				if (!(fieldName == "START_COMMENT" || fieldName == "END_COMMENT")) {
+
 					file_writer.print(fields[s.sym].getName());
-					
-					// Print token value if it exists
 					if (s.value != null) {
-						// Validate and handle integer values
 						if (fields[s.sym].getName() == "INT") {
 							if (((String)s.value).charAt(0) == '0' && ((String)s.value).length() > 1) {
 								throw new Exception("leading zeros in a non-zero number");
@@ -87,8 +90,6 @@ public class Main
 						}
 						file_writer.print(")");
 					}
-					
-					// Print token position
 					file_writer.print("[");
 					file_writer.print(l.getLine());
 					file_writer.print(",");
@@ -97,25 +98,35 @@ public class Main
 					
 					file_writer.print("\n");
 				}
-				
+				// file_writer.print("Start porision" + l.getTokenStartPosition() + "\n");
+				/*********************/
+				/* [7] Print to file */
+				/*********************/
+				// file_writer.print(l.getLine());
+				// file_writer.print(": ");
+				// file_writer.print(s.value);
+				// file_writer.print("\n");
+				// } 
+
+
+
 				/***********************/
-				/* [7] Read next token */
+				/* [8] Read next token */
 				/***********************/
 				s = l.next_token();
 
 
 			}
-
-			// Check for unclosed comment at EOF
+			
 			if (isComment) throw new Exception("EOF inside a comment");
 
 			/******************************/
-			/* [8] Close lexer input file */
+			/* [9] Close lexer input file */
 			/******************************/
 			l.yyclose();
 
 			/**************************/
-			/* [9] Close output file */
+			/* [10] Close output file */
 			/**************************/
 			file_writer.close();
     	}
@@ -133,9 +144,14 @@ public class Main
 
 			}
 			catch (Exception e1) {
-				System.out.println("ERROR");
+				System.out.println("WTF??????????");
 				e1.printStackTrace();
 			}
 		}
 	}
 }
+
+
+
+
+
