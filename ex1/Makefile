@@ -22,7 +22,7 @@ MANIFEST_FILE        = ${MANIFEST_DIR}/MANIFEST.MF
 ########################
 # DEFINITIONS :: JFlex #
 ########################
-JFlex_PROGRAM  = /usr/local/bin/jflex
+JFlex_PROGRAM  = jflex
 JFlex_FLAGS    = -q
 JFlex_DEST_DIR = ${SRC_DIR}
 JFlex_FILE     = ${JFlex_DIR}/LEX_FILE.lex
