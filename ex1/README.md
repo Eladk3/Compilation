@@ -7,7 +7,7 @@ This exercise is part of a semester-long project to implement a compiler for an 
 ## Programming Assignment
 
 The first exercise involves implementing a lexical scanner using the open-source tool JFlex. The scanner will take a single text file containing an L program as input and produce a tokenized representation of the input in a single text file.
-
+   
 ## Lexical Considerations
 
 - **Identifiers**: Contain letters and digits, must start with a letter.
