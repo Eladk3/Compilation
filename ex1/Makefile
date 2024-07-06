@@ -30,7 +30,7 @@ JFlex_FILE     = ${JFlex_DIR}/LEX_FILE.lex
 ########################
 # DEFINITIONS :: LEXER #
 ########################
-INPUT    = ${INPUT_DIR}/TEST_02_Merge_Lists.txt
+INPUT    = ${INPUT_DIR}/Input.txt
 OUTPUT   = ${OUTPUT_DIR}/OutputTokens.txt
 
 all:
@@ -60,7 +60,7 @@ all:
 	@echo "*                                                          *"
 	@echo "*                                                          *"
 	@echo "************************************************************"
-	$(JFlex_PROGRAM) ${JFlex_FLAGS} -d ${JFlex_DEST_DIR} ${JFlex_FILE}
+	${JFlex_PROGRAM} ${JFlex_FLAGS} -d ${JFlex_DEST_DIR} ${JFlex_FILE}
 	@echo "\n"
 	@echo "*********************************************************************"
 	@echo "*                                                                   *"
@@ -69,12 +69,12 @@ all:
 	@echo "*                                                                   *"
 	@echo "*                                                                   *"
 	@echo "*********************************************************************"
-	javac -cp ${EXTERNAL_JAR_FILES} -d ${BIN_DIR} ${SRC_FILES}
+	javac -cp ${EXTERNAL_JAR_FILES}:${SRC_DIR} -d ${BIN_DIR} ${SRC_FILES}
 	@echo "\n"
 	@echo "************************************************************************"
 	@echo "*                                                                      *"
 	@echo "*                                                                      *"
-	@echo "* [4] Create a JAR file from from *.class files + External *.jar files *"
+	@echo "* [4] Create a JAR file from *.class files + External *.jar files *"
 	@echo "*                                                                      *"
 	@echo "*                                                                      *"
 	@echo "************************************************************************"
@@ -87,5 +87,4 @@ all:
 	@echo "*                           *"
 	@echo "*                           *"
 	@echo "*****************************"
-	java -jar LEXER ${INPUT} ${OUTPUT}
-
+	java -cp LEXER:${EXTERNAL_JAR_FILES} Main ${INPUT} ${OUTPUT}

@@ -1,157 +1,134 @@
-   
 import java.io.*;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
-
 import java_cup.runtime.Symbol;
-   
-public class Main
-{
-	static public void main(String argv[])
-	{
-		Lexer l;
-		Symbol s;
-		FileReader file_reader;
-		PrintWriter file_writer = null;
-		String inputFilename = argv[0];
-		String outputFilename = argv[1];
-		boolean isComment = false;
-		String fieldName;
 
-		try
-		{
-			/********************************/
-			/* [1] Initialize a file reader */
-			/********************************/
-			file_reader = new FileReader(inputFilename);
+public class Main {
+    public static void main(String[] args) {
+        Lexer l;
+        Symbol s;
+        FileReader file_reader = null;
+        PrintWriter file_writer = null;
+        String inputFilename = args[0];
+        String outputFilename = args[1];
+        boolean isComment = false;
+        String fieldName;
 
-			/********************************/
-			/* [2] Initialize a file writer */
-			/********************************/
-			file_writer = new PrintWriter(outputFilename);
-			
-			/******************************/
-			/* [3] Initialize a new lexer */
-			/******************************/
-			l = new Lexer(file_reader);
+        try {
+            /********************************/
+            /* [1] Initialize a file reader */
+            /********************************/
+            file_reader = new FileReader(inputFilename);
 
-			/***********************/
-			/* [4] Read next token */
-			/***********************/
-			s = l.next_token();
+            /********************************/
+            /* [2] Initialize a file writer */
+            /********************************/
+            file_writer = new PrintWriter(new FileWriter(outputFilename));
+            
+            /******************************/
+            /* [3] Initialize a new lexer */
+            /******************************/
+            l = new Lexer(file_reader);
 
-			/********************************/
-			/* [5] Main reading tokens loop */
-			/********************************/
-			while (s.sym != TokenNames.EOF)
-			{
-				/************************/
-				/* [6] Print to console */
-				/************************/
-				/* 
-				df
+            /***********************/
+            /* [4] Read next token */
+            /***********************/
+            s = l.next_token();
 
-				//*/
-				Class<TokenNames> tokenNamesClass = TokenNames.class;
+            /********************************/
+            /* [5] Main reading tokens loop */
+            /********************************/
+            while (s.sym != TokenNames.EOF) {
+                /************************/
+                /* [6] Print to console */
+                /************************/
+                Class<TokenNames> tokenNamesClass = TokenNames.class;
 
-				Field[] fields = tokenNamesClass.getDeclaredFields();
-				
-				if (s.sym == TokenNames.START_COMMENT) isComment = true;
-				if (s.sym == TokenNames.END_COMMENT) isComment = false;
+                Field[] fields = tokenNamesClass.getDeclaredFields();
 
+                // Check for comment tokens
+                if (s.sym == TokenNames.START_COMMENT) isComment = true;
+                if (s.sym == TokenNames.END_COMMENT) isComment = false;
+                
+                // Check for error tokens
+                if (fields[s.sym].getName().equals("ERROR")) {
+                    throw new Exception("Illegal characters");
+                }
+                
+                fieldName = fields[s.sym].getName();
 
-				// if (!isComment && s.sym == TokenNames.ELSE)
-				// 	file_writer.println("ERROR");
-				// if (!isComment) {
-				// file_writer.println(fields[s.sym].getName());
-				if (fields[s.sym].getName() == "ERROR") {
-					// file_writer.println(s.value);
-					throw new Exception("Illegal characters");
-				}
-				fieldName = fields[s.sym].getName();
-				if (!(fieldName == "START_COMMENT" || fieldName == "END_COMMENT")) {
+                // Skip comment tokens for writing to the file
+                if (!(fieldName.equals("START_COMMENT") || fieldName.equals("END_COMMENT"))) {
+                    file_writer.print(fields[s.sym].getName());
+                    
+                    // Print token value if it exists
+                    if (s.value != null) {
+                        // Validate and handle integer values
+                        if (fields[s.sym].getName().equals("INT")) {
+                            if (((String)s.value).charAt(0) == '0' && ((String)s.value).length() > 1) {
+                                throw new Exception("leading zeros in a non-zero number");
+                            }
+                            int val = Integer.valueOf((String)s.value);
+                            if (0 > val || val > 32767) {
+                                throw new Exception("integer too big");
+                            }
+                        }
+                        file_writer.print("(");
+                        if (s.value instanceof String && fields[s.sym].getName().equals("STRING")) {
+                            file_writer.print(s.value);
+                        } else {
+                            file_writer.print(s.value);
+                        }
+                        file_writer.print(")");
+                    }
+                    
+                    // Print token position
+                    file_writer.print("[");
+                    file_writer.print(l.getLine());
+                    file_writer.print(",");
+                    file_writer.print(l.getTokenStartPosition());
+                    file_writer.print("]");
+                    file_writer.print("\n");
+                }
+                
+                /***********************/
+                /* [7] Read next token */
+                /***********************/
+                s = l.next_token();
+            }
 
-					file_writer.print(fields[s.sym].getName());
-					if (s.value != null) {
-						if (fields[s.sym].getName() == "INT") {
-							if (((String)s.value).charAt(0) == '0' && ((String)s.value).length() > 1) {
-								throw new Exception("leading zeros in a non-zero number");
-							}
-							int val = Integer.valueOf((String)s.value);
-							if (0 > val || val > 32767) {
-								throw new Exception("integer too big");
-							}
-						}
-						file_writer.print("(");
-						if (s.value instanceof String && fields[s.sym].getName() == "STRING") {
-							file_writer.print(s.value);
-						} else {
-							file_writer.print(s.value);
-						}
-						file_writer.print(")");
-					}
-					file_writer.print("[");
-					file_writer.print(l.getLine());
-					file_writer.print(",");
-					file_writer.print(l.getTokenStartPosition());
-					file_writer.print("]");
-					
-					file_writer.print("\n");
-				}
-				// file_writer.print("Start porision" + l.getTokenStartPosition() + "\n");
-				/*********************/
-				/* [7] Print to file */
-				/*********************/
-				// file_writer.print(l.getLine());
-				// file_writer.print(": ");
-				// file_writer.print(s.value);
-				// file_writer.print("\n");
-				// } 
+            // Check for unclosed comment at EOF
+            if (isComment) throw new Exception("EOF inside a comment");
 
+            /******************************/
+            /* [8] Close lexer input file */
+            /******************************/
+            l.yyclose();
 
-
-				/***********************/
-				/* [8] Read next token */
-				/***********************/
-				s = l.next_token();
-
-
-			}
-			
-			if (isComment) throw new Exception("EOF inside a comment");
-
-			/******************************/
-			/* [9] Close lexer input file */
-			/******************************/
-			l.yyclose();
-
-			/**************************/
-			/* [10] Close output file */
-			/**************************/
-			file_writer.close();
-    	}
-			     
-		catch (Exception e)
-		{
-			try {
-				
-				if (file_writer != null) {
-					file_writer = new PrintWriter(outputFilename);
-				}
-				file_writer.print("ERROR");
-				file_writer.close();
-				// e.printStackTrace();
-
-			}
-			catch (Exception e1) {
-				System.out.println("WTF??????????");
-				e1.printStackTrace();
-			}
-		}
-	}
+            /**************************/
+            /* [9] Close output file */
+            /**************************/
+            file_writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (file_writer != null) {
+                try {
+                    file_writer = new PrintWriter(new FileWriter(outputFilename));
+                    file_writer.print("ERROR");
+                    file_writer.close();
+                } catch (Exception e1) {
+                    System.out.println("ERROR");
+                    e1.printStackTrace();
+                }
+            } else {
+                System.out.println("ERROR: Unable to initialize file writer.");
+            }
+        } finally {
+            try {
+                if (file_reader != null) file_reader.close();
+                if (file_writer != null) file_writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
-
-
-
-
-
