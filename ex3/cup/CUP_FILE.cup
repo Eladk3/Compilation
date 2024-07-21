@@ -1,0 +1,258 @@
+/*************/
+/* IMPORT(S) */
+/*************/
+import java_cup.runtime.*;
+import AST.*;
+import java.io.PrintWriter;
+
+parser code 
+{:
+	public Lexer lexer;
+	public boolean errorInLexer = false;
+	public PrintWriter fileWriter;
+	public int lastTokenLine;
+
+	public Parser(Lexer lexer, PrintWriter fileWriter)
+	{
+		super(lexer);
+		this.lexer = lexer;
+		this.fileWriter = fileWriter;
+		lastTokenLine = 0;
+	}
+	public void report_error(String message, Object info)
+	{
+		if(errorInLexer){
+			fileWriter.write("ERROR\n");
+		}
+		else{
+			fileWriter.write("ERROR("+lexer.getLine()+")\n");
+		}
+		System.out.print("ERROR >> ");		
+		System.out.print("[");
+		System.out.print(lexer.getLine());
+		System.out.print(":");
+		System.out.print(lexer.getCharPos());
+		System.out.print("] ");		
+		fileWriter.close();
+		System.exit(0);
+	}
+:}
+
+/************************/
+/* CUSTOMIZE CUP PARSER */
+/************************/
+scan with
+{:
+	Symbol s;
+	this.lastTokenLine = lexer.getLine();
+	s = lexer.next_token();
+	//System.out.print(s.sym);
+	if(s.sym == TokenNames.error){
+		errorInLexer = true;
+	}
+	System.out.print("[");
+	System.out.print(lexer.getLine());
+	System.out.print(":");
+	System.out.print(lexer.getCharPos());
+	System.out.print("] ");
+	System.out.print(TokenNames.terminalNames[s.sym]);
+	if (s.value != null)
+	{
+		System.out.print("( ");
+		System.out.print(s.value);
+		System.out.print(" )");
+	}
+	System.out.print("\n");
+	return s; 
+:};
+
+/*************/
+/* TERMINALS */
+/*************/
+terminal IF;
+terminal EQ;
+terminal DOT;
+terminal PLUS;
+terminal MINUS;
+terminal TIMES;
+terminal WHILE;
+terminal DIVIDE;
+terminal LPAREN;
+terminal RPAREN;
+terminal LBRACK;
+terminal RBRACK;
+terminal LBRACE;
+terminal RBRACE;
+terminal SEMICOLON;
+terminal ASSIGN;
+terminal TYPE_INT;
+terminal TYPE_STRING;
+terminal TYPE_VOID;
+terminal ARRAY;
+terminal COMMA;
+terminal CLASS;
+terminal EXTENDS;
+terminal NIL;
+terminal RETURN;
+terminal NEW;
+terminal LT;
+terminal GT;
+terminal COMMENT;
+
+/*************/
+/* TERMINALS */
+/*************/
+terminal Integer INT;
+terminal String ID;
+terminal String STRING;
+
+
+
+/*****************/
+/* NON TERMINALS */
+/*****************/
+non terminal AST_EXP exp;
+non terminal AST_VAR var;
+non terminal AST_STMT stmt;
+non terminal AST_STMT_LIST stmtList;
+non terminal AST_PROGRAM program;
+non terminal AST_DECLARATION dec;
+non terminal AST_TYPE typei;
+non terminal AST_VARDEC varDec;
+non terminal AST_FUNCDEC funcDec;
+non terminal AST_CLASSDEC classDec;
+non terminal AST_ARRAY_TYPEDEF arrayTypedef;
+non terminal AST_NEW_EXP newExp;
+non terminal AST_CFIELD cField;
+non terminal AST_BINOP BINOP;
+non terminal AST_VAR_AND_DOT varDot;
+non terminal AST_FUNC_ARGS funcArgs;
+non terminal AST_CFIELD_LIST cFieldList;
+non terminal AST_CALL_FUNC callFunc;
+non terminal AST_EXP_ARGS expArgs;
+
+
+
+/***********************/
+/* OPERATOR PRECEDENCE */
+/***********************/
+precedence nonassoc ASSIGN;
+precedence left EQ;
+precedence left LT, GT;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence nonassoc LBRACK;
+precedence nonassoc LPAREN;
+precedence left DOT;
+
+/************************/
+/* START WITH: program */
+/************************/
+start with program;
+
+/********************/
+/* DERIVATION RULES */
+/********************/
+
+program		::=		dec:declar							{: RESULT = new AST_PROGRAM_LIST(declar, null, parser.lastTokenLine);          :}		
+					| dec:declar program:prog			{: RESULT = new AST_PROGRAM_LIST(declar, prog, parser.lastTokenLine);          :}
+					;
+
+dec			::= 	varDec:vd 							{: RESULT = new AST_DECLARATION_VARDEC(vd, parser.lastTokenLine);          :}
+					| funcDec:fd						{: RESULT = new AST_DECLARATION_FUNC_DEC(fd, parser.lastTokenLine);          :}
+					| classDec:cd 						{: RESULT = new AST_DECLARATION_CLASS_DEC(cd, parser.lastTokenLine);          :}
+					| arrayTypedef:atd 					{: RESULT = new AST_DECLARATION_ARRAY_TYPEDEF(atd, parser.lastTokenLine);          :}
+					| COMMENT
+					;
+
+
+arrayTypedef ::=	ARRAY ID:name EQ typei:typ LBRACK RBRACK SEMICOLON 		{: RESULT = new AST_ARRAY_TYPEDEF_SINGLE(name, typ, parser.lastTokenLine);          :}
+					;
+
+varDec		::=		typei:t ID:name SEMICOLON 					{: RESULT = new AST_VARDEC_TYPE_AND_ID(t, name, parser.lastTokenLine);          :}
+					| typei:t ID:name ASSIGN exp:ex SEMICOLON				{: RESULT = new AST_VARDEC_TYPE_AND_ID_EXP(t, name, ex, parser.lastTokenLine);          :}
+					| typei:t ID:name ASSIGN newExp:nex SEMICOLON			{: RESULT = new AST_VARDEC_TYPE_AND_ID_NEW_EXP(t, name, nex, parser.lastTokenLine);          :}
+					;
+
+funcDec 	::=		typei:t ID:name LPAREN RPAREN LBRACE stmtList:body RBRACE 	{: RESULT = new AST_FUNCDEC_NO_ARGS(t, name, body, parser.lastTokenLine);          :}
+					| typei:t ID:name LPAREN funcArgs:args RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AST_FUNCDEC_WITH_ARGS(t, name, args, body, parser.lastTokenLine);          :}
+					;
+
+classDec	::=		CLASS ID:name LBRACE cFieldList:body RBRACE			{: RESULT = new AST_CLASSDEC_SIMPLE(name, body, parser.lastTokenLine);          :}
+					| CLASS ID:name EXTENDS ID:sup LBRACE cFieldList:body RBRACE	{: RESULT = new AST_CLASSDEC_INHERITANCE(name, sup, body, parser.lastTokenLine);          :}
+					;
+typei		::=		TYPE_INT							{: RESULT = new AST_TYPE_TYPEINT(parser.lastTokenLine);          :}
+					| TYPE_STRING						{: RESULT = new AST_TYPE_TYPESTRING(parser.lastTokenLine);          :}
+					| TYPE_VOID							{: RESULT = new AST_TYPE_TYPEVOID(parser.lastTokenLine);          :}
+					| ID:typeName						{: RESULT = new AST_TYPE_TYPEID(typeName, parser.lastTokenLine);          :}
+					;
+
+var			::=		ID:name								{: RESULT = new AST_VAR_SIMPLE(name, parser.lastTokenLine);       :}
+					| varDot:vd ID:fieldName			{: RESULT = new AST_VAR_FIELD(vd,fieldName, parser.lastTokenLine); :}
+					| var:v LBRACK exp:e RBRACK			{: RESULT = new AST_VAR_SUBSCRIPT(v,e, parser.lastTokenLine);     :}
+					;
+
+stmt		::=		varDec: v								{: RESULT = new AST_STMT_VARDEC(v, parser.lastTokenLine);		 :}
+					| var:v ASSIGN exp:e SEMICOLON			{: RESULT = new AST_STMT_ASSIGN(v,e, parser.lastTokenLine); :}
+					| var:v ASSIGN newExp:ne SEMICOLON		{: RESULT = new AST_STMT_ASSIGN_NEW_EXP(v,ne, parser.lastTokenLine);		 :}
+					| RETURN SEMICOLON						{: RESULT = new AST_STMT_RETURN(parser.lastTokenLine);		 :}
+					| RETURN exp:e SEMICOLON				{: RESULT = new AST_STMT_RETURN_WITH_EXP(e, parser.lastTokenLine);		 :}
+					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AST_STMT_IF(   cond,body, parser.lastTokenLine); :}
+					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AST_STMT_WHILE(cond,body, parser.lastTokenLine); :}
+					| callFunc:f SEMICOLON					{: RESULT = new AST_STMT_CALL_FUNC(f, parser.lastTokenLine); :}		
+					| COMMENT
+					;
+
+newExp		::=		NEW typei:t								{: RESULT = new AST_NEW_EXP_TYPE(t, parser.lastTokenLine);		 :}
+					| NEW typei:t LBRACK exp:e RBRACK		{: RESULT = new AST_NEW_EXP_TYPE_EXP(t, e, parser.lastTokenLine);		 :}
+					;
+
+cField		::=		varDec:vd								{: RESULT = new AST_CFIELD_VARDEC(vd, parser.lastTokenLine);		 :}
+					| funcDec:fd 							{: RESULT = new AST_CFIELD_FUNCDEC(fd, parser.lastTokenLine);		 :}
+					;
+
+BINOP		::=		MINUS									{: RESULT = new AST_BINOP_OPERATION(1, parser.lastTokenLine);		 :}
+					| TIMES									{: RESULT = new AST_BINOP_OPERATION(2, parser.lastTokenLine);		 :}
+					| DIVIDE								{: RESULT = new AST_BINOP_OPERATION(3, parser.lastTokenLine);		 :}
+					| LT									{: RESULT = new AST_BINOP_OPERATION(4, parser.lastTokenLine);		 :}
+					| GT									{: RESULT = new AST_BINOP_OPERATION(5, parser.lastTokenLine);		 :}
+					;
+
+varDot 		::=		var:v DOT								{: RESULT = new AST_VAR_AND_DOT_SINGLE(v, parser.lastTokenLine);		 :}
+					;
+
+exp			::=		var:v								{: RESULT = new AST_EXP_VAR(v, parser.lastTokenLine);          :}
+					| LPAREN exp:e RPAREN				{: RESULT = new AST_EXP_IN_PARENTHESIS(e, parser.lastTokenLine);          :}
+					| exp:e1 PLUS exp:e2				{: RESULT = new AST_EXP_ADDITION(e1, e2, parser.lastTokenLine);			:}
+					| exp:e1 EQ exp:e2					{: RESULT = new AST_EXP_EQUAL(e1, e2, parser.lastTokenLine);			:}
+					| exp:e1 BINOP:op exp:e2			{: RESULT = new AST_EXP_BINOP(e1, op, e2, parser.lastTokenLine);			:}
+					| callFunc:f						{: RESULT = new AST_EXP_FUNCTION_CALL(f, parser.lastTokenLine);          :}
+					| MINUS INT:i 						{: RESULT = new AST_EXP_INT(-i, parser.lastTokenLine);          :}
+					| INT:i 							{: RESULT = new AST_EXP_INT(i, parser.lastTokenLine);          :}
+					| NIL								{: RESULT = new AST_EXP_NIL(parser.lastTokenLine);          :}
+					| STRING:s							{: RESULT = new AST_EXP_STRING(s, parser.lastTokenLine);          :}
+					;
+
+
+funcArgs	::=		typei:t ID:name									{: RESULT = new AST_FUNC_ARGS(t, name, null, parser.lastTokenLine);		 :}
+					| typei:t ID:name COMMA funcArgs:fa				{: RESULT = new AST_FUNC_ARGS(t, name, fa, parser.lastTokenLine);		 :}
+					;
+
+stmtList	::=		stmt:s	stmtList:l		{: RESULT = new AST_STMT_LIST(s,l, parser.lastTokenLine);    :}
+					| stmt:s				{: RESULT = new AST_STMT_LIST(s,null, parser.lastTokenLine); :}
+					;
+
+cFieldList	::=		cField:c cFieldList:l				{: RESULT = new AST_CFIELD_LIST(c, l, parser.lastTokenLine);    :}
+					| cField:c							{: RESULT = new AST_CFIELD_LIST(c, null, parser.lastTokenLine);    :}
+					;
+
+expArgs		::=		exp:e								{: RESULT = new AST_EXP_ARGS(e, null, parser.lastTokenLine);    :}
+					| exp:e COMMA expArgs:ea			{: RESULT = new AST_EXP_ARGS(e, ea, parser.lastTokenLine);    :}
+					;
+
+callFunc	::=		ID:name LPAREN RPAREN							{: RESULT = new AST_CALL_FUNC_NO_ARGS(name, parser.lastTokenLine);    :}
+					| varDot:vd ID:name LPAREN RPAREN				{: RESULT = new AST_CALL_FUNC_VAR_DOT_NO_ARGS(vd, name, parser.lastTokenLine);    :}
+					| ID:name LPAREN expArgs:ea RPAREN				{: RESULT = new AST_CALL_FUNC_WITH_ARGS(name, ea, parser.lastTokenLine);    :}
+					| varDot:vd ID:name LPAREN expArgs:ea RPAREN	{: RESULT = new AST_CALL_FUNC_VAR_DOT_WITH_ARGS(vd, name, ea, parser.lastTokenLine);    :}
+					;
+
